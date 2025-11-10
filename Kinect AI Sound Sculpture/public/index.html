@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinect Movement Soundscape - Live Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .main-view {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(30, 30, 60, 0.3) 0%, transparent 70%);
+        }
+
+        #skeletonCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .status-bar {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.connected {
+            background: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .status-indicator.disconnected {
+            background: #ff4444;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+        }
+
+        .status-indicator.error {
+            background: #ffaa00;
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+        }
+
+        .metrics-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .metrics-panel h3 {
+            margin-bottom: 10px;
+            color: #00ff88;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            transition: width 0.2s ease;
+            border-radius: 2px;
+        }
+
+        .body-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .body-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .body-id {
+            color: #00ccff;
+            font-weight: bold;
+        }
+
+        .fps-counter {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .control-button {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        .visualization-options {
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .error-message {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulsing {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .audio-controls {
+            padding: 10px 0;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+            appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00ff88;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #00ff88;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .audio-status .status-text {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .audio-status .status-text.active {
+            color: #00ff88;
+        }
+
+        .audio-status .status-text.error {
+            color: #ff4444;
+        }
+
+        #audioVizCanvas {
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .audio-metrics {
+            font-size: 11px;
+        }
+
+        .control-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Sonic Environment Styles */
+        .environment-display {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .environment-name {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .environment-description {
+            font-size: 11px;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .discovery-container {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .discovery-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 10px;
+        }
+
+        .discovery-name {
+            width: 60px;
+            text-align: left;
+            margin-right: 8px;
+        }
+
+        .discovery-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 8px;
+        }
+
+        .discovery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .discovery-percent {
+            width: 35px;
+            text-align: right;
+            color: #888;
+        }
+
+        /* Visual Indicators */
+        .environment-hint {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 255, 136, 0.9);
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .transition-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+        }
+
+        .unlock-notification {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .unlock-animation {
+            animation: unlockCelebration 3s ease-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes unlockCelebration {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.8);
+            }
+            20% {
+                opacity: 1;
+                transform: translateY(0) scale(1.1);
+            }
+            80% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.9);
+            }
+        }
+
+        .environment-controls {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+        }
+
+        /* Multi-person interaction styles */
+        .status-display {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 11px;
+            border-left: 3px solid transparent;
+        }
+
+        .coordination-active {
+            border-left-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .coordination-inactive {
+            border-left-color: #888;
+            color: #888;
+        }
+
+        .duet-active {
+            border-left-color: #00ccff;
+            color: #00ccff;
+        }
+
+        .duet-inactive {
+            border-left-color: #888;
+            color: #888;
+        }
+
+        .choreography-active {
+            border-left-color: #ff0088;
+            color: #ff0088;
+        }
+
+        .choreography-inactive {
+            border-left-color: #888;
+            color: #888;
+        }
+
+        .patterns-display {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 11px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .learned-pattern {
+            background: rgba(255, 136, 0, 0.1);
+            border-left: 3px solid #ff8800;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        .patterns-learning {
+            color: #ffaa00;
+            font-style: italic;
+        }
+
+        .patterns-none {
+            color: #888;
+            font-style: italic;
+        }
+
+        .interaction-display {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            padding: 8px;
+        }
+
+        .current-interaction {
+            font-size: 11px;
+        }
+
+        /* Interaction visual effects on canvas */
+        .coordination-line {
+            stroke-dasharray: 10, 5;
+            animation: coordinationPulse 2s ease-in-out infinite;
+        }
+
+        .duet-aura {
+            animation: duetGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes coordinationPulse {
+            0%, 100% { stroke-opacity: 0.6; }
+            50% { stroke-opacity: 1; }
+        }
+
+        @keyframes duetGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        /* Health and performance indicators */
+        .health-indicator, .performance-indicator {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .health-indicator.healthy, .performance-indicator.excellent {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .health-indicator.degraded, .performance-indicator.good {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+
+        .health-indicator.critical, .performance-indicator.poor {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .performance-indicator.critical {
+            background: rgba(255, 0, 0, 0.3);
+            color: #ff0000;
+            animation: pulse 2s infinite;
+        }
+
+        /* System status classes */
+        .degraded-mode {
+            filter: sepia(0.3);
+        }
+
+        .safe-mode {
+            filter: grayscale(0.5);
+        }
+
+        .safe-mode::before {
+            content: "⚠️ SAFE MODE";
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 170, 0, 0.9);
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1 style="font-size: 18px; margin-bottom: 20px; color: #00ff88;">Movement Soundscape</h1>
+
+            <div id="errorContainer"></div>
+
+            <div class="metrics-panel">
+                <h3>Connection Status</h3>
+                <div class="connection-status">
+                    <div id="statusIndicator" class="status-indicator disconnected"></div>
+                    <span id="statusText">Disconnected</span>
+                </div>
+                <div class="metric-item">
+                    <span>Connected Clients:</span>
+                    <span id="clientCount" class="metric-value">0</span>
+                </div>
+                <div class="metric-item">
+                    <span>System Health:</span>
+                    <span id="systemHealth" class="health-indicator healthy">healthy</span>
+                </div>
+                <div class="metric-item">
+                    <span>Performance:</span>
+                    <span id="performanceHealth" class="performance-indicator excellent">60 FPS</span>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Aggregate Metrics</h3>
+                <div class="metric-item">
+                    <span>Total Bodies:</span>
+                    <span id="totalBodies" class="metric-value">0</span>
+                </div>
+                <div class="metric-item">
+                    <span>Average Motion:</span>
+                    <span id="averageMotion" class="metric-value">0.00</span>
+                    <div class="progress-bar">
+                        <div id="averageMotionBar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <span>Hand Activity:</span>
+                    <span id="handActivity" class="metric-value">0.00</span>
+                    <div class="progress-bar">
+                        <div id="handActivityBar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <span>Group Cohesion:</span>
+                    <span id="groupCohesion" class="metric-value">0.00</span>
+                    <div class="progress-bar">
+                        <div id="groupCohesionBar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <span>Energy Level:</span>
+                    <span id="energyLevel" class="metric-value">0.00</span>
+                    <div class="progress-bar">
+                        <div id="energyLevelBar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Tracked Bodies</h3>
+                <div id="bodyList" class="body-list">
+                    <div style="color: #888; font-size: 11px; text-align: center;">No bodies detected</div>
+                </div>
+            </div>
+
+            <div class="visualization-options">
+                <h3 style="color: #00ff88; font-size: 14px; margin-bottom: 10px;">Visualization</h3>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showJoints" checked>
+                    <label for="showJoints">Show Joints</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showBones" checked>
+                    <label for="showBones">Show Bones</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showTrails" checked>
+                    <label for="showTrails">Show Movement Trails</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showMetrics">
+                    <label for="showMetrics">Show Metrics Overlay</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showParticles" checked>
+                    <label for="showParticles">Show Particles</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showVisualEffects" checked>
+                    <label for="showVisualEffects">Visual Effects</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showBeatIndicators" checked>
+                    <label for="showBeatIndicators">Beat Indicators</label>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Visual Effects Status</h3>
+                <div class="metric-item">
+                    <span>Active Particles:</span>
+                    <span id="activeParticles" class="metric-value">0</span>
+                </div>
+                <div class="metric-item">
+                    <span>Background Mode:</span>
+                    <span id="backgroundMode" class="metric-value">calm</span>
+                </div>
+                <div class="metric-item">
+                    <span>Color Temperature:</span>
+                    <span id="colorTemp" class="metric-value">neutral</span>
+                </div>
+                <div class="metric-item">
+                    <span>Beat Indicators:</span>
+                    <span id="beatCount" class="metric-value">0</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="control-button" onclick="clearTrails()">Clear Trails</button>
+                <button class="control-button" onclick="resetView()">Reset View</button>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Audio Controls</h3>
+                <div class="audio-controls">
+                    <div class="control-row">
+                        <button id="audioToggle" class="control-button">🔊 Start Audio</button>
+                        <button id="muteToggle" class="control-button">🔇 Mute</button>
+                    </div>
+                    <div class="control-row">
+                        <label for="masterVolume">Volume:</label>
+                        <input type="range" id="masterVolume" min="0" max="100" value="70" class="volume-slider">
+                        <span id="volumeDisplay">70%</span>
+                    </div>
+                    <div class="audio-status">
+                        <span id="audioStatus" class="status-text">Audio Stopped</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Audio Visualization</h3>
+                <canvas id="audioVizCanvas" width="260" height="100"></canvas>
+                <div class="audio-metrics">
+                    <div class="metric-item">
+                        <span>Audio Latency:</span>
+                        <span id="audioLatency" class="metric-value">0ms</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Active Layers:</span>
+                        <span id="activeLayers" class="metric-value">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>AI Movement Interpretation</h3>
+                <div class="ai-controls">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="enableAI" checked>
+                        <label for="enableAI">Enable AI Interpretation</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showAIDebug">
+                        <label for="showAIDebug">Show AI Debug Info</label>
+                    </div>
+                </div>
+                <div id="aiDebugPanel" style="margin-top: 10px;"></div>
+                <div class="ai-metrics" style="font-size: 11px; margin-top: 10px;">
+                    <div class="metric-item">
+                        <span>Processing Mode:</span>
+                        <span id="aiProcessingMode" class="metric-value">Enhanced</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Visitor Type:</span>
+                        <span id="visitorType" class="metric-value">Learning...</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Gestures Detected:</span>
+                        <span id="gesturesDetected" class="metric-value">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Musical Phrases:</span>
+                        <span id="musicalPhrases" class="metric-value">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Sonic Environments</h3>
+                <div class="environment-display">
+                    <div class="current-environment">
+                        <div class="environment-name">
+                            Current: <span id="currentEnvironment">Neutral</span>
+                        </div>
+                        <div class="environment-description" id="environmentDescription">
+                            Starting ambient space for exploration
+                        </div>
+                    </div>
+                    <div class="environment-stats">
+                        <div class="metric-item">
+                            <span>Unlocked:</span>
+                            <span id="unlockedEnvironments" class="metric-value">1/6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="discovery-section" style="margin-top: 10px;">
+                    <h4 style="font-size: 11px; margin-bottom: 5px; color: #00ff88;">Discovery Progress</h4>
+                    <div id="discoveryProgress" class="discovery-container">
+                        <!-- Discovery progress bars will be populated here -->
+                    </div>
+                </div>
+
+                <div class="environment-controls" style="margin-top: 10px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="enableEnvironments" checked>
+                        <label for="enableEnvironments">Enable Environment Discovery</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showEnvironmentInfo" checked>
+                        <label for="showEnvironmentInfo">Show Environment Info</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Multi-Person Interactions</h3>
+
+                <div class="interaction-display">
+                    <div class="current-interaction">
+                        <div class="metric-item">
+                            <span>Participants:</span>
+                            <span id="totalParticipants" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-item">
+                            <span>Group Cohesion:</span>
+                            <span id="groupCohesion" class="metric-value">0%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span>Formation:</span>
+                            <span id="groupFormation" class="metric-value">unknown</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="coordination-section" style="margin-top: 10px;">
+                    <h4 style="font-size: 11px; margin-bottom: 5px; color: #00ff88;">Coordination Status</h4>
+                    <div id="coordinationStatus" class="status-display">
+                        <div class="coordination-inactive">Moving independently</div>
+                    </div>
+                </div>
+
+                <div class="duet-section" style="margin-top: 10px;">
+                    <h4 style="font-size: 11px; margin-bottom: 5px; color: #00ff88;">Duet Modes</h4>
+                    <div id="duetModeStatus" class="status-display">
+                        <div class="duet-inactive">No active duet modes</div>
+                    </div>
+                    <div class="metric-item" style="margin-top: 5px;">
+                        <span>Active Duets:</span>
+                        <span id="activeDuets" class="metric-value">0</span>
+                    </div>
+                </div>
+
+                <div class="choreography-section" style="margin-top: 10px;">
+                    <h4 style="font-size: 11px; margin-bottom: 5px; color: #00ff88;">Group Choreography</h4>
+                    <div id="choreographyStatus" class="status-display">
+                        <div class="choreography-inactive">No group patterns detected</div>
+                    </div>
+                </div>
+
+                <div class="patterns-section" style="margin-top: 10px;">
+                    <h4 style="font-size: 11px; margin-bottom: 5px; color: #00ff88;">Learned Patterns</h4>
+                    <div id="learnedPatterns" class="patterns-display">
+                        <div class="patterns-none">No patterns learned yet</div>
+                    </div>
+                    <div class="metric-item" style="margin-top: 5px;">
+                        <span>Pattern Count:</span>
+                        <span id="learnedPatternsCount" class="metric-value">0</span>
+                    </div>
+                </div>
+
+                <div class="interaction-controls" style="margin-top: 10px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="enableMultiPerson" checked>
+                        <label for="enableMultiPerson">Enable Multi-Person Detection</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showInteractionInfo" checked>
+                        <label for="showInteractionInfo">Show Interaction Info</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-view">
+            <div class="canvas-container">
+                <canvas id="skeletonCanvas"></canvas>
+
+                <!-- Environment visual indicators -->
+                <div id="environmentHint" class="environment-hint">Forest environment nearby...</div>
+                <div id="transitionEffect" class="transition-effect">Transitioning...</div>
+                <div id="unlockNotification" class="unlock-notification">🌍 Ocean Discovered!</div>
+            </div>
+            <div class="status-bar">
+                <div class="fps-counter">
+                    FPS: <span id="fpsCounter">0</span> |
+                    Last Update: <span id="lastUpdate">Never</span>
+                </div>
+                <div style="font-size: 12px; color: #888;">
+                    Azure Kinect Movement Tracking
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Dependencies -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+
+    <!-- Core Framework -->
+    <script src="core/EventBus.js"></script>
+    <script src="core/ModuleManager.js"></script>
+    <script src="core/ErrorHandler.js"></script>
+    <script src="core/PerformanceOptimizer.js"></script>
+    <script src="config/ConfigManager.js"></script>
+
+    <!-- Plugin Framework -->
+    <script src="plugins/BasePlugin.js"></script>
+    <script src="plugins/SoundEnvironmentPlugin.js"></script>
+
+    <!-- Core Modules -->
+    <script src="modules/NetworkManager.js"></script>
+    <script src="modules/DataProcessor.js"></script>
+
+    <!-- Audio Modules -->
+    <script src="immersive-audio-engine.js"></script>
+    <script src="spatial-audio-layers.js"></script>
+    <script src="ai-musical-composition.js"></script>
+    <script src="psychoacoustic-processors.js"></script>
+
+    <!-- Visual Modules -->
+    <script src="modules/VisualRenderer.js"></script>
+    <script src="particle-system.js"></script>
+    <script src="visual-effects.js"></script>
+
+    <!-- Analysis Modules -->
+    <script src="ai-movement-interpreter.js"></script>
+    <script src="modules/AIMovementInterpreter.js"></script>
+    <script src="gesture-recognition.js"></script>
+    <script src="modules/GestureRecognition.js"></script>
+    <script src="musical-intelligence.js"></script>
+    <script src="modules/MusicalIntelligenceModule.js"></script>
+    <script src="adaptive-learning.js"></script>
+    <script src="modules/AdaptiveLearningModule.js"></script>
+    <script src="movement-memory.js"></script>
+    <script src="multi-person-interactions.js"></script>
+    <script src="modules/MultiPersonInteractionManager.js"></script>
+
+    <!-- Environment Plugins -->
+    <script src="plugins/environments/ForestEnvironmentPlugin.js"></script>
+
+    <!-- Legacy Support (will be refactored) -->
+    <script src="sonic-environments.js"></script>
+
+    <!-- Main Application -->
+    <script src="KinectSculptureApp.js"></script>
+
+    <!-- Application Initialization -->
+    <script>
+        // Initialize the modular application
+        let app;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('🎭 Initializing Kinect Sound Sculpture...');
+
+                app = new KinectSculptureApp();
+                await app.initialize();
+
+                console.log('✅ Application ready for use');
+
+                // Setup global error handler for debugging
+                window.addEventListener('error', (event) => {
+                    console.error('Global Error:', event.error);
+                });
+
+                // Make app available globally for debugging
+                window.kinectApp = app;
+
+            } catch (error) {
+                console.error('❌ Application initialization failed:', error);
+
+                // Show error to user
+                const errorContainer = document.getElementById('errorContainer');
+                if (errorContainer) {
+                    errorContainer.innerHTML = `
+                        <div class="error-message">
+                            <h3>System Initialization Error</h3>
+                            <p>The system failed to start properly. Please refresh the page to try again.</p>
+                            <details>
+                                <summary>Technical Details</summary>
+                                <pre>${error.message}\n${error.stack}</pre>
+                            </details>
+                        </div>
+                    `;
+                    errorContainer.style.display = 'block';
+                }
+            }
+        });
+
+        // Graceful shutdown on page unload
+        window.addEventListener('beforeunload', () => {
+            if (app) {
+                app.shutdown();
+            }
+        });
+    </script>
+</body>
+</html>

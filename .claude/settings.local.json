@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(winget install:*)",
+      "Bash(choco install:*)",
+      "Bash(gh:*)",
+      "Bash(refreshenv)",
+      "Bash(/c/ProgramData/chocolatey/bin/gh --version)",
+      "Bash(where gh:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

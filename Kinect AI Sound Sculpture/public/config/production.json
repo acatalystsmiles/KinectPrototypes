@@ -1,0 +1,83 @@
+{
+  "system": {
+    "debug": false,
+    "performance": {
+      "targetFPS": 60,
+      "maxParticles": 1000,
+      "audioBufferSize": 1024
+    },
+    "errorReporting": true,
+    "gracefulDegradation": true
+  },
+  "audio": {
+    "enabled": true,
+    "masterVolume": 0.8,
+    "spatialAudio": true,
+    "latencyOptimization": true,
+    "environments": {
+      "discovery": true,
+      "autoTransition": true,
+      "crossfadeDuration": 3000
+    }
+  },
+  "visual": {
+    "enabled": true,
+    "particles": {
+      "enabled": true,
+      "count": 750,
+      "trails": true,
+      "trailLength": 40
+    },
+    "effects": {
+      "coordination": true,
+      "duetAuras": true,
+      "environmentTransitions": true
+    },
+    "ui": {
+      "showMetrics": false,
+      "showDebug": false,
+      "theme": "dark"
+    }
+  },
+  "movement": {
+    "enabled": true,
+    "smoothing": 0.85,
+    "sensitivity": 1.0,
+    "coordinationThreshold": 0.7
+  },
+  "multiPerson": {
+    "enabled": true,
+    "coordination": {
+      "threshold": 0.7,
+      "syncWindow": 1000,
+      "minDuration": 3000
+    },
+    "duetModes": {
+      "enabled": true,
+      "autoActivation": true,
+      "compatibilityThreshold": 0.75
+    },
+    "groupChoreography": {
+      "enabled": true,
+      "minParticipants": 3,
+      "detectionSensitivity": 0.8
+    }
+  },
+  "installation": {
+    "autoStart": true,
+    "idleTimeout": 300000,
+    "resetOnIdle": true,
+    "maxParticipants": 6,
+    "welcomeMessage": false,
+    "attractMode": {
+      "enabled": true,
+      "interval": 45000,
+      "volume": 0.4
+    }
+  },
+  "network": {
+    "reconnectInterval": 3000,
+    "maxReconnectAttempts": 15,
+    "timeout": 8000
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(timeout 10 npm start)",
+      "Bash(npm start)",
+      "Bash(node:*)",
+      "WebFetch(domain:docs.claude.com)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

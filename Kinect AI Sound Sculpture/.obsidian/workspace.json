@@ -1,0 +1,246 @@
+{
+  "main": {
+    "id": "e668372add77db6a",
+    "type": "split",
+    "children": [
+      {
+        "id": "1ab7f440e475d7c9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9cbe53071f0122c7",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
+            }
+          },
+          {
+            "id": "d853f7ba569b0562",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Claude Code Development Best Practices & Obsidian Integration Guide.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Claude Code Development Best Practices & Obsidian Integration Guide"
+            }
+          }
+        ],
+        "currentTab": 1
+      },
+      {
+        "id": "6b656c52b75ed499",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "85615f29d330b195",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "CLAUDE_PROMPTS.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "CLAUDE_PROMPTS"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4daa59868ae7affc",
+    "type": "split",
+    "children": [
+      {
+        "id": "2ea8b644b1a8b7cd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1ad08096aeaea549",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "fddf9fc431e50343",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "8e0842818023d008",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "d4846a17eae0ec3c",
+    "type": "split",
+    "children": [
+      {
+        "id": "af5456d76fea94d6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "df0ec422115ed2ce",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "CLAUDE_PROMPTS.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for CLAUDE_PROMPTS"
+            }
+          },
+          {
+            "id": "78719ad8258812bf",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "CLAUDE_PROMPTS.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from CLAUDE_PROMPTS"
+            }
+          },
+          {
+            "id": "2de7bdecd1064d3d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "a3d21a18c8a8e905",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "CLAUDE_PROMPTS.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of CLAUDE_PROMPTS"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "d853f7ba569b0562",
+  "lastOpenFiles": [
+    "public/modules/MusicalIntelligenceModule.js",
+    "public/modules/AdaptiveLearningModule.js",
+    "public/modules/VisualRenderer.js",
+    "CLAUDE_PROMPTS.md",
+    "docs/README.md",
+    "docs/emergency-procedures.md",
+    "docs/performance-optimization-guide.md",
+    "docs/calibration-procedures.md",
+    "docs/troubleshooting-guide.md",
+    "docs/installation-setup-guide.md",
+    "docs",
+    "tests/run-all-tests.js",
+    "tests/load/extended-operation.test.js",
+    "tests/load",
+    "tests/automated/recorded-data-tests.js",
+    "tests/automated",
+    "tests/performance/multi-person-performance.test.js",
+    "tests/performance",
+    "Claude Code Development Best Practices & Obsidian Integration Guide.md",
+    "SOUND_SYSTEM_TESTING.md",
+    "SETUP.md",
+    "INTEGRATION_PLAN.md",
+    "KinectBridge/README.md",
+    "README.md",
+    "node_modules/unpipe/README.md",
+    "node_modules/unpipe/HISTORY.md",
+    "node_modules/ignore-by-default/README.md",
+    "node_modules/is-binary-path/readme.md",
+    "node_modules/toidentifier/README.md",
+    "node_modules/toidentifier/HISTORY.md",
+    "node_modules/supports-color/readme.md",
+    "node_modules/is-glob/README.md",
+    "node_modules/nodemon/README.md",
+    "node_modules/socket.io/Readme.md",
+    "node_modules/engine.io-parser/Readme.md",
+    "node_modules/express/History.md"
+  ]
+}
