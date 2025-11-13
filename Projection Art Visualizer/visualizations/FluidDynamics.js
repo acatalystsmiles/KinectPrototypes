@@ -27,8 +27,8 @@ class FluidDynamics extends BaseVisualization {
 
         this.params = {
             viscosity: 0.0001,
-            diffusion: 0.0001,
-            fadeRate: 0.99,
+            diffusion: 0.00005,
+            fadeRate: 0.995,
             forceStrength: 100,
             dyeIntensity: 5.0
         };
@@ -104,8 +104,8 @@ class FluidDynamics extends BaseVisualization {
 
                             // ALWAYS add dye at joint positions (not just when moving)
                             const speed = Math.sqrt(vx * vx + vy * vy);
-                            const baseDye = 0.1 * this.params.dyeIntensity; // Continuous dye
-                            const speedDye = speed * 0.5 * this.params.dyeIntensity; // Extra dye when moving
+                            const baseDye = 0.3 * this.params.dyeIntensity; // Continuous dye (increased)
+                            const speedDye = speed * 0.8 * this.params.dyeIntensity; // Extra dye when moving
                             this.density0[idx] += (baseDye + speedDye) * falloff;
                         }
                     }
