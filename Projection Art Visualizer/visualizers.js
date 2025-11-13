@@ -16,7 +16,8 @@ class VisualizationManager {
             cloth: VerletCloth,
             boids: BoidsSimulation,
             waves: WaveInterference,
-            rain: Rain
+            rain: Rain,
+            gravity: Gravity
         };
     }
 

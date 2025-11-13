@@ -175,6 +175,22 @@ function setupControls() {
     });
     document.getElementById('reset-rain').addEventListener('click', () => vizManager.reset());
 
+    // Gravity controls
+    setupControl('gravity-particle-count', (v) => vizManager.updateParams({ particleCount: parseInt(v) }));
+    setupControl('g-constant', (v) => vizManager.updateParams({ gravitationalConstant: parseFloat(v) }));
+    setupControl('joint-mass', (v) => vizManager.updateParams({ jointMass: parseFloat(v) }));
+    setupControl('initial-speed', (v) => vizManager.updateParams({ initialSpeed: parseFloat(v) }));
+    setupControl('gravity-drag', (v) => vizManager.updateParams({ drag: parseFloat(v) }));
+    setupControl('gravity-particle-size', (v) => vizManager.updateParams({ particleSize: parseFloat(v) }));
+    setupControl('gravity-trail', (v) => vizManager.updateParams({ trailLength: parseFloat(v) }));
+    document.getElementById('gravity-color-mode').addEventListener('change', (e) => {
+        vizManager.updateParams({ colorMode: e.target.value });
+    });
+    document.getElementById('show-field-lines').addEventListener('change', (e) => {
+        vizManager.updateParams({ showFieldLines: e.target.checked });
+    });
+    document.getElementById('reset-gravity').addEventListener('click', () => vizManager.reset());
+
     // Initialize with default mode
     showControlsForMode('particleField');
 }
@@ -196,6 +212,7 @@ function showControlsForMode(mode) {
     document.getElementById('boids-controls').style.display = 'none';
     document.getElementById('wave-controls').style.display = 'none';
     document.getElementById('rain-controls').style.display = 'none';
+    document.getElementById('gravity-controls').style.display = 'none';
 
     // Show controls for selected mode
     switch (mode) {
@@ -216,6 +233,9 @@ function showControlsForMode(mode) {
             break;
         case 'rain':
             document.getElementById('rain-controls').style.display = 'block';
+            break;
+        case 'gravity':
+            document.getElementById('gravity-controls').style.display = 'block';
             break;
     }
 }

@@ -132,6 +132,7 @@
                 <option value="boids">Boids/Flocking</option>
                 <option value="waves">Wave Interference</option>
                 <option value="rain">Rain</option>
+                <option value="gravity">Gravity & Orbits</option>
             </select>
         </div>
 
@@ -300,6 +301,62 @@
             <button id="reset-rain">Reset Rain</button>
         </div>
 
+        <div id="gravity-controls" style="display:none;">
+            <div class="control-group">
+                <label>Particle Count <span class="slider-value" id="gravity-particle-count-val">500</span></label>
+                <input type="range" id="gravity-particle-count" min="100" max="2000" value="500" step="50">
+            </div>
+
+            <div class="control-group">
+                <label>Gravitational Constant <span class="slider-value" id="g-constant-val">100</span></label>
+                <input type="range" id="g-constant" min="10" max="500" value="100" step="10">
+            </div>
+
+            <div class="control-group">
+                <label>Joint Mass <span class="slider-value" id="joint-mass-val">1000</span></label>
+                <input type="range" id="joint-mass" min="100" max="5000" value="1000" step="100">
+            </div>
+
+            <div class="control-group">
+                <label>Initial Speed <span class="slider-value" id="initial-speed-val">2</span></label>
+                <input type="range" id="initial-speed" min="0" max="10" value="2" step="0.5">
+            </div>
+
+            <div class="control-group">
+                <label>Drag <span class="slider-value" id="gravity-drag-val">0.999</span></label>
+                <input type="range" id="gravity-drag" min="0.95" max="1.0" value="0.999" step="0.001">
+            </div>
+
+            <div class="control-group">
+                <label>Particle Size <span class="slider-value" id="gravity-particle-size-val">3</span></label>
+                <input type="range" id="gravity-particle-size" min="1" max="8" value="3" step="1">
+            </div>
+
+            <div class="control-group">
+                <label>Trail Length <span class="slider-value" id="gravity-trail-val">0.95</span></label>
+                <input type="range" id="gravity-trail" min="0" max="0.99" value="0.95" step="0.01">
+            </div>
+
+            <div class="control-group">
+                <label>Color Mode</label>
+                <select id="gravity-color-mode">
+                    <option value="velocity">Velocity (Speed)</option>
+                    <option value="energy">Energy (Heat Map)</option>
+                    <option value="orbit">Orbital Type</option>
+                    <option value="white">White</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="show-field-lines">
+                    Show Gravitational Field Lines
+                </label>
+            </div>
+
+            <button id="reset-gravity">Reset Gravity</button>
+        </div>
+
         <div class="control-group">
             <label>Kinect Data Source</label>
             <select id="data-source">
@@ -319,6 +376,7 @@
     <script src="visualizations/Boids.js"></script>
     <script src="visualizations/WaveInterference.js"></script>
     <script src="visualizations/Rain.js"></script>
+    <script src="visualizations/Gravity.js"></script>
     <script src="visualizers.js"></script>
     <script src="app.js"></script>
 </body>
