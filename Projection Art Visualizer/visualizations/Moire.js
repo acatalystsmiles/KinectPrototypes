@@ -40,12 +40,12 @@ class Moire extends BaseVisualization {
     }
 
     update(deltaTime) {
-        this.time += deltaTime * 0.001 * this.params.animationSpeed;
+        this.time += deltaTime * this.params.animationSpeed;
 
         // Auto-rotate patterns if enabled
         if (this.params.autoRotate) {
-            this.layer1Rotation += deltaTime * 0.0001 * this.params.animationSpeed;
-            this.layer2Rotation += deltaTime * 0.00015 * this.params.animationSpeed;
+            this.layer1Rotation += deltaTime * 0.1 * this.params.animationSpeed;
+            this.layer2Rotation += deltaTime * 0.15 * this.params.animationSpeed;
         } else {
             this.layer1Rotation = this.params.layer1Angle * Math.PI / 180;
             this.layer2Rotation = this.params.layer2Angle * Math.PI / 180;
