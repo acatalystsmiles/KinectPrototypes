@@ -11,12 +11,11 @@ class VisualizationManager {
 
         // Registry of available visualizations
         this.visualizations = {
-            particleField: ParticleField
-            // Add more visualization classes here as they're implemented
-            // fluidDynamics: FluidDynamics,
-            // cloth: VerletCloth,
-            // boids: BoidsSimulation,
-            // waves: WaveInterference
+            particleField: ParticleField,
+            fluidDynamics: FluidDynamics,
+            cloth: VerletCloth,
+            boids: BoidsSimulation,
+            waves: WaveInterference
         };
     }
 
