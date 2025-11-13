@@ -204,6 +204,23 @@ function setupControls() {
     });
     document.getElementById('reset-water-waves').addEventListener('click', () => vizManager.reset());
 
+    // Moiré Pattern controls
+    document.getElementById('moire-pattern-type').addEventListener('change', (e) => {
+        vizManager.updateParams({ patternType: e.target.value });
+    });
+    setupControl('layer1-angle', (v) => vizManager.updateParams({ layer1Angle: parseFloat(v) }));
+    setupControl('layer2-angle', (v) => vizManager.updateParams({ layer2Angle: parseFloat(v) }));
+    setupControl('moire-density', (v) => vizManager.updateParams({ density: parseFloat(v) }));
+    setupControl('line-thickness', (v) => vizManager.updateParams({ lineThickness: parseFloat(v) }));
+    setupControl('animation-speed', (v) => vizManager.updateParams({ animationSpeed: parseFloat(v) }));
+    document.getElementById('moire-color-mode').addEventListener('change', (e) => {
+        vizManager.updateParams({ colorMode: e.target.value });
+    });
+    document.getElementById('auto-rotate').addEventListener('change', (e) => {
+        vizManager.updateParams({ autoRotate: e.target.checked });
+    });
+    document.getElementById('reset-moire').addEventListener('click', () => vizManager.reset());
+
     // Initialize with default mode
     showControlsForMode('particleField');
 }
@@ -227,6 +244,7 @@ function showControlsForMode(mode) {
     document.getElementById('rain-controls').style.display = 'none';
     document.getElementById('gravity-controls').style.display = 'none';
     document.getElementById('water-waves-controls').style.display = 'none';
+    document.getElementById('moire-controls').style.display = 'none';
 
     // Show controls for selected mode
     switch (mode) {
@@ -253,6 +271,9 @@ function showControlsForMode(mode) {
             break;
         case 'waterWaves':
             document.getElementById('water-waves-controls').style.display = 'block';
+            break;
+        case 'moire':
+            document.getElementById('moire-controls').style.display = 'block';
             break;
     }
 }

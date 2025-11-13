@@ -18,7 +18,8 @@ class VisualizationManager {
             waves: WaveInterference,
             rain: Rain,
             gravity: Gravity,
-            waterWaves: WaterWaves
+            waterWaves: WaterWaves,
+            moire: Moire
         };
     }
 
