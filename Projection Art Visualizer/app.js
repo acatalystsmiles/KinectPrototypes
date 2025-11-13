@@ -221,6 +221,20 @@ function setupControls() {
     });
     document.getElementById('reset-moire').addEventListener('click', () => vizManager.reset());
 
+    // Falling Sand controls
+    setupControl('sand-spawn-rate', (v) => vizManager.updateParams({ spawnRate: parseFloat(v) }));
+    setupControl('sand-spawn-width', (v) => vizManager.updateParams({ spawnWidth: parseFloat(v) }));
+    document.getElementById('sand-color-mode').addEventListener('change', (e) => {
+        vizManager.updateParams({ colorMode: e.target.value });
+    });
+    document.getElementById('sand-body-mode').addEventListener('change', (e) => {
+        vizManager.updateParams({ bodyMode: e.target.value });
+    });
+    document.getElementById('sand-auto-spawn').addEventListener('change', (e) => {
+        vizManager.updateParams({ autoSpawn: e.target.checked });
+    });
+    document.getElementById('reset-sand').addEventListener('click', () => vizManager.reset());
+
     // Initialize with default mode
     showControlsForMode('particleField');
 }
@@ -245,6 +259,7 @@ function showControlsForMode(mode) {
     document.getElementById('gravity-controls').style.display = 'none';
     document.getElementById('water-waves-controls').style.display = 'none';
     document.getElementById('moire-controls').style.display = 'none';
+    document.getElementById('falling-sand-controls').style.display = 'none';
 
     // Show controls for selected mode
     switch (mode) {
@@ -274,6 +289,9 @@ function showControlsForMode(mode) {
             break;
         case 'moire':
             document.getElementById('moire-controls').style.display = 'block';
+            break;
+        case 'fallingSand':
+            document.getElementById('falling-sand-controls').style.display = 'block';
             break;
     }
 }

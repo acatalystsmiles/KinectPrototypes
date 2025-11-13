@@ -19,7 +19,8 @@ class VisualizationManager {
             rain: Rain,
             gravity: Gravity,
             waterWaves: WaterWaves,
-            moire: Moire
+            moire: Moire,
+            fallingSand: FallingSand
         };
     }
 

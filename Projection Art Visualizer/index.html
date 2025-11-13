@@ -135,6 +135,7 @@
                 <option value="gravity">Gravity & Orbits</option>
                 <option value="waterWaves">Water Waves</option>
                 <option value="moire">Moiré Patterns</option>
+                <option value="fallingSand">Falling Sand</option>
             </select>
         </div>
 
@@ -457,6 +458,46 @@
             <button id="reset-moire">Reset Pattern</button>
         </div>
 
+        <div id="falling-sand-controls" style="display:none;">
+            <div class="control-group">
+                <label>Spawn Rate <span class="slider-value" id="sand-spawn-rate-val">10</span></label>
+                <input type="range" id="sand-spawn-rate" min="1" max="50" value="10" step="1">
+            </div>
+
+            <div class="control-group">
+                <label>Spawn Width <span class="slider-value" id="sand-spawn-width-val">0.5</span></label>
+                <input type="range" id="sand-spawn-width" min="0.1" max="1.0" value="0.5" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Color Mode</label>
+                <select id="sand-color-mode">
+                    <option value="golden">Golden Sand</option>
+                    <option value="rainbow">Rainbow</option>
+                    <option value="ocean">Ocean Blue</option>
+                    <option value="volcanic">Volcanic</option>
+                    <option value="monochrome">Monochrome</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Body Interaction</label>
+                <select id="sand-body-mode">
+                    <option value="spawn">Spawn from Joints</option>
+                    <option value="block">Block Falling Sand</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="sand-auto-spawn" checked>
+                    Auto Spawn from Top
+                </label>
+            </div>
+
+            <button id="reset-sand">Clear Sand</button>
+        </div>
+
         <div class="control-group">
             <label>Kinect Data Source</label>
             <select id="data-source">
@@ -479,6 +520,7 @@
     <script src="visualizations/Gravity.js"></script>
     <script src="visualizations/WaterWaves.js"></script>
     <script src="visualizations/Moire.js"></script>
+    <script src="visualizations/FallingSand.js"></script>
     <script src="visualizers.js"></script>
     <script src="app.js"></script>
 </body>

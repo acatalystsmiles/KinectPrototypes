@@ -25,9 +25,9 @@ class Rain extends BaseVisualization {
         this.raindrops = [];
         this.splashes = [];
 
-        // Create initial raindrops
+        // Create initial raindrops spread throughout screen for constant rain
         for (let i = 0; i < this.params.rainIntensity; i++) {
-            this.raindrops.push(new Raindrop(this.width, this.height, this.params));
+            this.raindrops.push(new Raindrop(this.width, this.height, this.params, true));
         }
     }
 
@@ -268,9 +268,16 @@ class Rain extends BaseVisualization {
  * Individual raindrop
  */
 class Raindrop {
-    constructor(maxX, maxY, params) {
+    constructor(maxX, maxY, params, spreadVertically = false) {
         this.x = Math.random() * maxX;
-        this.y = -Math.random() * maxY; // Start above screen
+
+        // Spread raindrops throughout screen for constant rain effect
+        if (spreadVertically) {
+            this.y = Math.random() * (maxY + 200) - 200; // Spread from just above to bottom
+        } else {
+            this.y = -Math.random() * 50; // Start just above screen for respawning
+        }
+
         this.vx = params.windStrength * 2;
         this.vy = Math.random() * 2;
     }

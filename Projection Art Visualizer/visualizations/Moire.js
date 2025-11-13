@@ -47,29 +47,33 @@ class Moire extends BaseVisualization {
             this.layer1Rotation += deltaTime * 0.1 * this.params.animationSpeed;
             this.layer2Rotation += deltaTime * 0.15 * this.params.animationSpeed;
         } else {
+            // Manual control mode - use sliders or body tracking
             this.layer1Rotation = this.params.layer1Angle * Math.PI / 180;
             this.layer2Rotation = this.params.layer2Angle * Math.PI / 180;
+
+            // Body interaction: Use joints to influence rotation (only when NOT auto-rotating)
+            if (this.bodyData && this.bodyData.length > 0) {
+                const body = this.bodyData[0];
+
+                // Left hand controls layer 1 rotation
+                const leftHand = body.joints.find(j => j.type === 'HAND_LEFT');
+                if (leftHand) {
+                    const normalizedX = leftHand.x / this.width;
+                    this.layer1Rotation = normalizedX * Math.PI * 2;
+                }
+
+                // Right hand controls layer 2 rotation
+                const rightHand = body.joints.find(j => j.type === 'HAND_RIGHT');
+                if (rightHand) {
+                    const normalizedX = rightHand.x / this.width;
+                    this.layer2Rotation = normalizedX * Math.PI * 2;
+                }
+            }
         }
 
-        // Body interaction: Use joints to influence rotation
+        // Body can always control density regardless of rotation mode
         if (this.bodyData && this.bodyData.length > 0) {
             const body = this.bodyData[0];
-
-            // Left hand controls layer 1 rotation
-            const leftHand = body.joints.find(j => j.type === 'HAND_LEFT');
-            if (leftHand) {
-                const normalizedX = leftHand.x / this.width;
-                this.layer1Rotation = normalizedX * Math.PI * 2;
-            }
-
-            // Right hand controls layer 2 rotation
-            const rightHand = body.joints.find(j => j.type === 'HAND_RIGHT');
-            if (rightHand) {
-                const normalizedX = rightHand.x / this.width;
-                this.layer2Rotation = normalizedX * Math.PI * 2;
-            }
-
-            // Head height controls density
             const head = body.joints.find(j => j.type === 'HEAD');
             if (head) {
                 const normalizedY = 1 - (head.y / this.height);
