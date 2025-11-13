@@ -213,6 +213,9 @@ class Moire extends BaseVisualization {
 
     renderRotatingSnakes() {
         // Peripheral drift illusion - stationary pattern that appears to move
+        // Reset blend mode for this pattern (it doesn't use layering)
+        this.ctx.globalCompositeOperation = 'source-over';
+
         const tileSize = this.params.density * 3;
         const numSegments = 4;
         const segmentSize = tileSize / numSegments;
@@ -260,6 +263,9 @@ class Moire extends BaseVisualization {
 
     renderFraserSpiral() {
         // Fraser spiral illusion - concentric circles that appear to spiral
+        // Reset blend mode for this pattern
+        this.ctx.globalCompositeOperation = 'source-over';
+
         const centerX = this.width / 2;
         const centerY = this.height / 2;
         const spacing = this.params.density;
@@ -295,6 +301,9 @@ class Moire extends BaseVisualization {
 
     renderPinnaIllusion() {
         // Pinna illusion - creates perception of rotation
+        // Reset blend mode for this pattern
+        this.ctx.globalCompositeOperation = 'source-over';
+
         const centerX = this.width / 2;
         const centerY = this.height / 2;
         const ringSpacing = this.params.density * 2;
@@ -344,11 +353,11 @@ class Moire extends BaseVisualization {
     getColor(layerIndex) {
         if (this.params.colorMode === 'color') {
             const hue = (layerIndex * 180 + this.time * 50) % 360;
-            return `hsla(${hue}, 100%, 50%, 0.7)`;
+            return `hsl(${hue}, 100%, 50%)`;
         } else if (this.params.colorMode === 'inverted') {
-            return 'rgba(0, 0, 0, 0.7)';
+            return '#000000';
         } else {
-            return 'rgba(255, 255, 255, 0.7)';
+            return '#ffffff';
         }
     }
 }
