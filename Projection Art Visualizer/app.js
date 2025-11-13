@@ -163,6 +163,18 @@ function setupControls() {
     setupControl('wave-amplitude', (v) => vizManager.updateParams({ amplitude: parseFloat(v) }));
     document.getElementById('reset-waves').addEventListener('click', () => vizManager.reset());
 
+    // Rain controls
+    setupControl('rain-intensity', (v) => vizManager.updateParams({ rainIntensity: parseInt(v) }));
+    setupControl('drop-speed', (v) => vizManager.updateParams({ dropSpeed: parseFloat(v) }));
+    setupControl('wind-strength', (v) => vizManager.updateParams({ windStrength: parseFloat(v) }));
+    setupControl('splash-intensity', (v) => vizManager.updateParams({ splashIntensity: parseFloat(v) }));
+    setupControl('drop-size', (v) => vizManager.updateParams({ dropSize: parseFloat(v) }));
+    setupControl('rain-trail', (v) => vizManager.updateParams({ trailLength: parseFloat(v) }));
+    document.getElementById('rain-color-mode').addEventListener('change', (e) => {
+        vizManager.updateParams({ colorMode: e.target.value });
+    });
+    document.getElementById('reset-rain').addEventListener('click', () => vizManager.reset());
+
     // Initialize with default mode
     showControlsForMode('particleField');
 }
@@ -183,6 +195,7 @@ function showControlsForMode(mode) {
     document.getElementById('cloth-controls').style.display = 'none';
     document.getElementById('boids-controls').style.display = 'none';
     document.getElementById('wave-controls').style.display = 'none';
+    document.getElementById('rain-controls').style.display = 'none';
 
     // Show controls for selected mode
     switch (mode) {
@@ -200,6 +213,9 @@ function showControlsForMode(mode) {
             break;
         case 'waves':
             document.getElementById('wave-controls').style.display = 'block';
+            break;
+        case 'rain':
+            document.getElementById('rain-controls').style.display = 'block';
             break;
     }
 }

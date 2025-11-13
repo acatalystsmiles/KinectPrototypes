@@ -131,6 +131,7 @@
                 <option value="cloth">Verlet Cloth</option>
                 <option value="boids">Boids/Flocking</option>
                 <option value="waves">Wave Interference</option>
+                <option value="rain">Rain</option>
             </select>
         </div>
 
@@ -255,6 +256,50 @@
             <button id="reset-waves">Reset Waves</button>
         </div>
 
+        <div id="rain-controls" style="display:none;">
+            <div class="control-group">
+                <label>Rain Intensity <span class="slider-value" id="rain-intensity-val">300</span></label>
+                <input type="range" id="rain-intensity" min="50" max="1000" value="300" step="50">
+            </div>
+
+            <div class="control-group">
+                <label>Drop Speed <span class="slider-value" id="drop-speed-val">8</span></label>
+                <input type="range" id="drop-speed" min="1" max="20" value="8" step="1">
+            </div>
+
+            <div class="control-group">
+                <label>Wind Strength <span class="slider-value" id="wind-strength-val">0.5</span></label>
+                <input type="range" id="wind-strength" min="-5" max="5" value="0.5" step="0.5">
+            </div>
+
+            <div class="control-group">
+                <label>Splash Intensity <span class="slider-value" id="splash-intensity-val">1.0</span></label>
+                <input type="range" id="splash-intensity" min="0" max="3" value="1.0" step="0.1">
+            </div>
+
+            <div class="control-group">
+                <label>Drop Size <span class="slider-value" id="drop-size-val">3</span></label>
+                <input type="range" id="drop-size" min="1" max="8" value="3" step="1">
+            </div>
+
+            <div class="control-group">
+                <label>Trail Length <span class="slider-value" id="rain-trail-val">0.85</span></label>
+                <input type="range" id="rain-trail" min="0" max="0.99" value="0.85" step="0.01">
+            </div>
+
+            <div class="control-group">
+                <label>Color Mode</label>
+                <select id="rain-color-mode">
+                    <option value="blue">Blue Rain</option>
+                    <option value="white">White Rain</option>
+                    <option value="rainbow">Rainbow Rain</option>
+                    <option value="neon">Neon Rain</option>
+                </select>
+            </div>
+
+            <button id="reset-rain">Reset Rain</button>
+        </div>
+
         <div class="control-group">
             <label>Kinect Data Source</label>
             <select id="data-source">
@@ -273,6 +318,7 @@
     <script src="visualizations/VerletCloth.js"></script>
     <script src="visualizations/Boids.js"></script>
     <script src="visualizations/WaveInterference.js"></script>
+    <script src="visualizations/Rain.js"></script>
     <script src="visualizers.js"></script>
     <script src="app.js"></script>
 </body>

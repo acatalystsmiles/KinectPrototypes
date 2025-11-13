@@ -15,7 +15,8 @@ class VisualizationManager {
             fluidDynamics: FluidDynamics,
             cloth: VerletCloth,
             boids: BoidsSimulation,
-            waves: WaveInterference
+            waves: WaveInterference,
+            rain: Rain
         };
     }
 
