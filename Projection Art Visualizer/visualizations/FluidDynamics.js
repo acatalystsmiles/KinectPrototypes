@@ -44,6 +44,18 @@ class FluidDynamics extends BaseVisualization {
         this.vy0 = new Array(size).fill(0);
         this.density = new Array(size).fill(0);
         this.density0 = new Array(size).fill(0);
+
+        // Clear previous joint tracking when resetting
+        this.previousJoints.clear();
+
+        // Add some initial seed dye to make visualization immediately visible
+        // This creates a subtle background that helps visibility on first load
+        for (let i = 0; i < size; i++) {
+            // Small random initial density across the field
+            if (Math.random() < 0.02) {
+                this.density[i] = Math.random() * 0.5;
+            }
+        }
     }
 
     update(deltaTime) {
@@ -104,7 +116,7 @@ class FluidDynamics extends BaseVisualization {
 
                             // ALWAYS add dye at joint positions (not just when moving)
                             const speed = Math.sqrt(vx * vx + vy * vy);
-                            const baseDye = 0.3 * this.params.dyeIntensity; // Continuous dye (increased)
+                            const baseDye = 0.5 * this.params.dyeIntensity; // Continuous dye (increased for immediate visibility)
                             const speedDye = speed * 0.8 * this.params.dyeIntensity; // Extra dye when moving
                             this.density0[idx] += (baseDye + speedDye) * falloff;
                         }
@@ -253,7 +265,7 @@ class FluidDynamics extends BaseVisualization {
                 const idx = i + j * this.gridSize;
                 const d = this.density[idx];
 
-                if (d > 0.001) {
+                if (d > 0.0001) {
                     const x = i * cellWidth;
                     const y = j * cellHeight;
 
@@ -261,7 +273,9 @@ class FluidDynamics extends BaseVisualization {
                     const normalized = Math.min(d / 2, 1);
                     const hue = (i / this.gridSize * 180 + j / this.gridSize * 180) % 360;
 
-                    this.ctx.fillStyle = `hsla(${hue}, 90%, 60%, ${normalized})`;
+                    // Ensure minimum visibility for faint dye
+                    const alpha = Math.max(normalized, 0.15);
+                    this.ctx.fillStyle = `hsla(${hue}, 90%, 60%, ${alpha})`;
                     this.ctx.fillRect(x, y, cellWidth + 1, cellHeight + 1);
                 }
             }
