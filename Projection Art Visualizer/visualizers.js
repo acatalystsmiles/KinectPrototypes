@@ -17,7 +17,8 @@ class VisualizationManager {
             boids: BoidsSimulation,
             waves: WaveInterference,
             rain: Rain,
-            gravity: Gravity
+            gravity: Gravity,
+            waterWaves: WaterWaves
         };
     }
 

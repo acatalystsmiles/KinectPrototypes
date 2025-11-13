@@ -191,6 +191,19 @@ function setupControls() {
     });
     document.getElementById('reset-gravity').addEventListener('click', () => vizManager.reset());
 
+    // Water Waves controls
+    setupControl('water-wave-speed', (v) => vizManager.updateParams({ waveSpeed: parseFloat(v) }));
+    setupControl('water-damping', (v) => vizManager.updateParams({ damping: parseFloat(v) }));
+    setupControl('disturbance-strength', (v) => vizManager.updateParams({ disturbanceStrength: parseFloat(v) }));
+    setupControl('water-amplitude', (v) => vizManager.updateParams({ amplitude: parseFloat(v) }));
+    document.getElementById('water-color-mode').addEventListener('change', (e) => {
+        vizManager.updateParams({ colorMode: e.target.value });
+    });
+    document.getElementById('show-wave-normals').addEventListener('change', (e) => {
+        vizManager.updateParams({ showNormals: e.target.checked });
+    });
+    document.getElementById('reset-water-waves').addEventListener('click', () => vizManager.reset());
+
     // Initialize with default mode
     showControlsForMode('particleField');
 }
@@ -213,6 +226,7 @@ function showControlsForMode(mode) {
     document.getElementById('wave-controls').style.display = 'none';
     document.getElementById('rain-controls').style.display = 'none';
     document.getElementById('gravity-controls').style.display = 'none';
+    document.getElementById('water-waves-controls').style.display = 'none';
 
     // Show controls for selected mode
     switch (mode) {
@@ -236,6 +250,9 @@ function showControlsForMode(mode) {
             break;
         case 'gravity':
             document.getElementById('gravity-controls').style.display = 'block';
+            break;
+        case 'waterWaves':
+            document.getElementById('water-waves-controls').style.display = 'block';
             break;
     }
 }
