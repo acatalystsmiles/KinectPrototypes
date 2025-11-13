@@ -28,9 +28,9 @@ class FluidDynamics extends BaseVisualization {
         this.params = {
             viscosity: 0.0001,
             diffusion: 0.0001,
-            fadeRate: 0.98,
+            fadeRate: 0.99,
             forceStrength: 100,
-            dyeIntensity: 1.0
+            dyeIntensity: 5.0
         };
     }
 
@@ -72,38 +72,41 @@ class FluidDynamics extends BaseVisualization {
                 const joint = body.joints[jointName];
                 if (!joint) continue;
 
+                // Grid coordinates
+                const gx = Math.floor(joint.x * this.gridSize);
+                const gy = Math.floor(joint.y * this.gridSize);
+
                 // Calculate velocity
                 const jointKey = `${body.id}_${jointName}`;
                 const prevJoint = this.previousJoints.get(jointKey);
+                let vx = 0, vy = 0;
 
                 if (prevJoint) {
-                    const vx = (joint.x - prevJoint.x) * this.gridSize * 50;
-                    const vy = (joint.y - prevJoint.y) * this.gridSize * 50;
+                    vx = (joint.x - prevJoint.x) * this.gridSize * 50;
+                    vy = (joint.y - prevJoint.y) * this.gridSize * 50;
+                }
 
-                    // Grid coordinates
-                    const gx = Math.floor(joint.x * this.gridSize);
-                    const gy = Math.floor(joint.y * this.gridSize);
+                // Add velocity and density in a radius around the joint
+                const radius = 5;
+                for (let dy = -radius; dy <= radius; dy++) {
+                    for (let dx = -radius; dx <= radius; dx++) {
+                        const x = gx + dx;
+                        const y = gy + dy;
 
-                    // Add velocity and density in a radius around the joint
-                    const radius = 3;
-                    for (let dy = -radius; dy <= radius; dy++) {
-                        for (let dx = -radius; dx <= radius; dx++) {
-                            const x = gx + dx;
-                            const y = gy + dy;
+                        if (x >= 0 && x < this.gridSize && y >= 0 && y < this.gridSize) {
+                            const idx = x + y * this.gridSize;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            const falloff = Math.max(0, 1 - dist / radius);
 
-                            if (x >= 0 && x < this.gridSize && y >= 0 && y < this.gridSize) {
-                                const idx = x + y * this.gridSize;
-                                const dist = Math.sqrt(dx * dx + dy * dy);
-                                const falloff = Math.max(0, 1 - dist / radius);
+                            // Add velocity
+                            this.vx0[idx] += vx * falloff * this.params.forceStrength;
+                            this.vy0[idx] += vy * falloff * this.params.forceStrength;
 
-                                // Add velocity
-                                this.vx0[idx] += vx * falloff * this.params.forceStrength;
-                                this.vy0[idx] += vy * falloff * this.params.forceStrength;
-
-                                // Add dye based on speed
-                                const speed = Math.sqrt(vx * vx + vy * vy);
-                                this.density0[idx] += speed * 0.5 * this.params.dyeIntensity * falloff;
-                            }
+                            // ALWAYS add dye at joint positions (not just when moving)
+                            const speed = Math.sqrt(vx * vx + vy * vy);
+                            const baseDye = 0.1 * this.params.dyeIntensity; // Continuous dye
+                            const speedDye = speed * 0.5 * this.params.dyeIntensity; // Extra dye when moving
+                            this.density0[idx] += (baseDye + speedDye) * falloff;
                         }
                     }
                 }
@@ -250,15 +253,15 @@ class FluidDynamics extends BaseVisualization {
                 const idx = i + j * this.gridSize;
                 const d = this.density[idx];
 
-                if (d > 0.01) {
+                if (d > 0.001) {
                     const x = i * cellWidth;
                     const y = j * cellHeight;
 
                     // Color based on density - using vibrant colors
-                    const intensity = Math.min(d * 50, 255);
-                    const hue = (d * 100) % 360;
+                    const normalized = Math.min(d / 2, 1);
+                    const hue = (i / this.gridSize * 180 + j / this.gridSize * 180) % 360;
 
-                    this.ctx.fillStyle = `hsla(${hue}, 80%, 50%, ${Math.min(d * 2, 1)})`;
+                    this.ctx.fillStyle = `hsla(${hue}, 90%, 60%, ${normalized})`;
                     this.ctx.fillRect(x, y, cellWidth + 1, cellHeight + 1);
                 }
             }

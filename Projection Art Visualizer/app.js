@@ -74,6 +74,7 @@ function setupControls() {
     // Visualization mode selector
     document.getElementById('viz-mode').addEventListener('change', (e) => {
         vizManager.switchMode(e.target.value);
+        showControlsForMode(e.target.value);
     });
 
     // Particle controls
@@ -136,6 +137,71 @@ function setupControls() {
             controlsPanel.classList.toggle('hidden');
         }
     });
+
+    // Fluid dynamics controls
+    setupControl('dye-intensity', (v) => vizManager.updateParams({ dyeIntensity: parseFloat(v) }));
+    setupControl('fade-rate', (v) => vizManager.updateParams({ fadeRate: parseFloat(v) }));
+    setupControl('fluid-force', (v) => vizManager.updateParams({ forceStrength: parseFloat(v) }));
+    document.getElementById('reset-fluid').addEventListener('click', () => vizManager.reset());
+
+    // Cloth controls
+    setupControl('cloth-gravity', (v) => vizManager.updateParams({ gravity: parseFloat(v) }));
+    setupControl('cloth-stiffness', (v) => vizManager.updateParams({ stiffness: parseFloat(v) }));
+    setupControl('cloth-force', (v) => vizManager.updateParams({ forceStrength: parseFloat(v) }));
+    document.getElementById('reset-cloth').addEventListener('click', () => vizManager.reset());
+
+    // Boids controls
+    setupControl('boid-count', (v) => vizManager.updateParams({ boidCount: parseInt(v) }));
+    setupControl('boid-separation', (v) => vizManager.updateParams({ separationStrength: parseFloat(v) }));
+    setupControl('boid-avoidance', (v) => vizManager.updateParams({ bodyAvoidanceStrength: parseFloat(v) }));
+    setupControl('boid-trail', (v) => vizManager.updateParams({ trailLength: parseFloat(v) }));
+    document.getElementById('reset-boids').addEventListener('click', () => vizManager.reset());
+
+    // Wave controls
+    setupControl('wave-speed', (v) => vizManager.updateParams({ waveSpeed: parseFloat(v) }));
+    setupControl('wave-frequency', (v) => vizManager.updateParams({ waveFrequency: parseFloat(v) }));
+    setupControl('wave-amplitude', (v) => vizManager.updateParams({ amplitude: parseFloat(v) }));
+    document.getElementById('reset-waves').addEventListener('click', () => vizManager.reset());
+
+    // Initialize with default mode
+    showControlsForMode('particleField');
+}
+
+function setupControl(id, handler) {
+    const element = document.getElementById(id);
+    const valueDisplay = document.getElementById(id + '-val');
+    element.addEventListener('input', (e) => {
+        handler(e.target.value);
+        valueDisplay.textContent = e.target.value;
+    });
+}
+
+function showControlsForMode(mode) {
+    // Hide all mode-specific controls
+    document.getElementById('particle-controls').style.display = 'none';
+    document.getElementById('fluid-controls').style.display = 'none';
+    document.getElementById('cloth-controls').style.display = 'none';
+    document.getElementById('boids-controls').style.display = 'none';
+    document.getElementById('wave-controls').style.display = 'none';
+
+    // Show controls for selected mode
+    switch (mode) {
+        case 'particleField':
+            document.getElementById('particle-controls').style.display = 'block';
+            break;
+        case 'fluidDynamics':
+            document.getElementById('fluid-controls').style.display = 'block';
+            break;
+        case 'cloth':
+            document.getElementById('cloth-controls').style.display = 'block';
+            break;
+        case 'boids':
+            document.getElementById('boids-controls').style.display = 'block';
+            break;
+        case 'waves':
+            document.getElementById('wave-controls').style.display = 'block';
+            break;
+    }
 }
 
 function setupDataSources() {

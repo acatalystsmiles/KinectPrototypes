@@ -14,12 +14,12 @@ class VerletCloth extends BaseVisualization {
         this.spacing = 0;
 
         this.params = {
-            gravity: 0.3,
-            damping: 0.98,
-            stiffness: 0.8,
-            tearDistance: 2.5,
-            forceRadius: 150,
-            forceStrength: 10
+            gravity: 0.5,
+            damping: 0.99,
+            stiffness: 0.9,
+            tearDistance: 3.0,
+            forceRadius: 120,
+            forceStrength: 15
         };
     }
 
@@ -34,8 +34,8 @@ class VerletCloth extends BaseVisualization {
             for (let x = 0; x < this.cols; x++) {
                 const point = new ClothPoint(
                     x * this.spacing,
-                    y * this.spacing - 50,
-                    x === 0 || x === this.cols - 1 // Pin top corners
+                    y * this.spacing + 100, // Start below top of screen
+                    y === 0 // Pin entire top row
                 );
                 this.points.push(point);
             }
