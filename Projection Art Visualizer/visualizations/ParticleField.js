@@ -14,6 +14,9 @@ class ParticleField extends BaseVisualization {
         this.noiseScale = 0.01;
         this.noiseZ = 0; // For animating the noise field
 
+        // Track previous joint positions for velocity calculation
+        this.previousJoints = new Map();
+
         // Default parameters
         this.params = {
             particleCount: 5000,
@@ -21,7 +24,7 @@ class ParticleField extends BaseVisualization {
             flowSpeed: 0.5,
             particleSize: 2,
             trailLength: 0.95,
-            colorMode: 'velocity'
+            colorMode: 'heatmap'
         };
     }
 
@@ -111,17 +114,67 @@ class ParticleField extends BaseVisualization {
                 const distSq = dx * dx + dy * dy;
                 const dist = Math.sqrt(distSq);
 
-                if (dist < 200 && dist > 0) {
-                    // Create a force field around the joint
-                    // Closer = stronger force
-                    const strength = (1 - dist / 200) * this.params.forceStrength;
+                // Calculate joint velocity for explosive bursts
+                const jointKey = `${body.id}_${jointName}`;
+                const prevJoint = this.previousJoints.get(jointKey);
+                let jointVelocity = 0;
 
-                    // Repulsion
-                    const angle = Math.atan2(dy, dx) + Math.PI;
+                if (prevJoint) {
+                    const vx = (joint.x - prevJoint.x) * this.width;
+                    const vy = (joint.y - prevJoint.y) * this.height;
+                    jointVelocity = Math.sqrt(vx * vx + vy * vy);
+                }
+
+                // Store current position for next frame
+                this.previousJoints.set(jointKey, { x: joint.x, y: joint.y });
+
+                const influenceRadius = 200 + (jointVelocity * 20); // Radius grows with speed
+
+                if (dist < influenceRadius && dist > 0) {
+                    // Normalize distance vector
+                    const ndx = dx / dist;
+                    const ndy = dy / dist;
+
+                    // Calculate falloff (closer = stronger)
+                    const falloff = 1 - (dist / influenceRadius);
+
+                    // Base strength from parameters
+                    const baseStrength = this.params.forceStrength;
+
+                    // VORTEX FORCE: Tangential component (perpendicular to radial)
+                    // Creates spiraling motion around the joint
+                    const vortexStrength = baseStrength * falloff * 3;
+                    const tangentX = -ndy; // Perpendicular to radial direction
+                    const tangentY = ndx;
+
                     particle.applyForce(
-                        Math.cos(angle) * strength * 2,
-                        Math.sin(angle) * strength * 2
+                        tangentX * vortexStrength,
+                        tangentY * vortexStrength
                     );
+
+                    // REPULSION FORCE: Push particles away (weaker than vortex)
+                    const repulsionStrength = baseStrength * falloff * 1.5;
+                    particle.applyForce(
+                        -ndx * repulsionStrength,
+                        -ndy * repulsionStrength
+                    );
+
+                    // EXPLOSIVE BURST: When joint moves fast, create strong outward force
+                    if (jointVelocity > 5) {
+                        const burstStrength = jointVelocity * falloff * 0.8;
+                        particle.applyForce(
+                            -ndx * burstStrength,
+                            -ndy * burstStrength
+                        );
+
+                        // Add some random scatter to explosion
+                        const randomAngle = Math.random() * Math.PI * 2;
+                        const randomStr = burstStrength * 0.3;
+                        particle.applyForce(
+                            Math.cos(randomAngle) * randomStr,
+                            Math.sin(randomAngle) * randomStr
+                        );
+                    }
                 }
             }
         }
@@ -157,6 +210,46 @@ class ParticleField extends BaseVisualization {
                 );
                 const hue = (speed * 10) % 360;
                 return `hsla(${hue}, 70%, 60%, 0.8)`;
+            }
+
+            case 'heatmap': {
+                // Heat map: slow = cool blue, medium = green/yellow, fast = hot red
+                const speed = Math.sqrt(
+                    particle.vel.x * particle.vel.x +
+                    particle.vel.y * particle.vel.y
+                );
+
+                // Normalize speed (0 to ~8 for typical particle speeds)
+                const normalizedSpeed = Math.min(speed / 8, 1);
+
+                let r, g, b;
+                if (normalizedSpeed < 0.25) {
+                    // Very slow: Deep blue to cyan
+                    const t = normalizedSpeed / 0.25;
+                    r = 0;
+                    g = Math.floor(t * 100);
+                    b = Math.floor(150 + t * 105);
+                } else if (normalizedSpeed < 0.5) {
+                    // Slow to medium: Cyan to green
+                    const t = (normalizedSpeed - 0.25) / 0.25;
+                    r = 0;
+                    g = Math.floor(100 + t * 155);
+                    b = Math.floor(255 - t * 155);
+                } else if (normalizedSpeed < 0.75) {
+                    // Medium to fast: Green to yellow/orange
+                    const t = (normalizedSpeed - 0.5) / 0.25;
+                    r = Math.floor(t * 255);
+                    g = 255;
+                    b = Math.floor(100 - t * 100);
+                } else {
+                    // Fast: Orange to red
+                    const t = (normalizedSpeed - 0.75) / 0.25;
+                    r = 255;
+                    g = Math.floor(255 - t * 155);
+                    b = 0;
+                }
+
+                return `rgba(${r}, ${g}, ${b}, 0.9)`;
             }
 
             case 'position': {
@@ -232,7 +325,7 @@ class Particle {
         };
         this.vel = { x: 0, y: 0 };
         this.acc = { x: 0, y: 0 };
-        this.maxSpeed = 4;
+        this.maxSpeed = 8; // Increased for more dramatic color changes
         this.maxForce = 0.5;
     }
 
